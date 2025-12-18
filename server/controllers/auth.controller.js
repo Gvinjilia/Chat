@@ -1,5 +1,5 @@
 const User = require("../models/user.model");
-const AppError = require("../utils/AppError");
+const AppError = require("../utils/appError.js");
 const catchAsync = require("../utils/catchAsync");
 
 const createSendToken = (user, statusCode, res) => {

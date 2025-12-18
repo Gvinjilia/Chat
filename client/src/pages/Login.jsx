@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
-import loginSignupBg from '../images/LoginSignUpBg.png';
+import loginSignupBg from '../images/LoginSignupBg.png';
 
 const Login = () => {
     const { login } = useContext(AuthContext);
