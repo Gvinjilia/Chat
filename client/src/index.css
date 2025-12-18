@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+@theme {
+    --button-bg-color: #2567f9;
+    --message-bg-color2: #F0F0F0;
+};
