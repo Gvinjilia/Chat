@@ -5,9 +5,9 @@ import { AuthContext } from "../context/AuthContext";
 import openSideBar from '../images/sidebar.png';
 import closeSideBar from '../images/sidebar (1).png';
 
-import background from '../images/MessangerBgimage.png';
-import background3 from '../images/MessangerBgimage3.png';
-import background4 from '../images/MessangerBgimage4.png';
+import background from '../images/MessangerBgImage.png';
+import background3 from '../images/MessangerBgImage3.png';
+import background4 from '../images/MessangerBgImage4.png';
 
 const Chat = () => {
     const { messages, sendMessage, createChat, currChat, search, getChats, chats, joinChat } = useContext(ChatContext);
