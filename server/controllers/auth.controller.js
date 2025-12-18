@@ -7,8 +7,8 @@ const createSendToken = (user, statusCode, res) => {
 
     const cookieSettings = {
         httpOnly: true, 
-        secure: false,
-        sameSite: 'Lax',
+        secure: true,
+        sameSite: 'None',
         maxAge: process.env.COOKIE_EXPIRES * 24 * 60 * 60 * 1000 
     };
 
