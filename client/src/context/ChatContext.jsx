@@ -15,7 +15,7 @@ export const ChatProvider = ({ children }) => {
     const socketRef = useRef(null);
 
     useEffect(() => {
-        socketRef.current = io('http://localhost:3000');
+        socketRef.current = io(`${API_URL}`);
 
         socketRef.current.on("message", (message) => {
             setMessages((prev) => [...prev, message]);
