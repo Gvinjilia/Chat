@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useEffect } from "react";
 import { createContext } from "react";
+import { toast } from "react-toastify";
 import { io } from 'socket.io-client';
 
 export const ChatContext = createContext();
@@ -79,6 +80,8 @@ export const ChatProvider = ({ children }) => {
     };
 
     const createChat = async (formData) => {
+        const toastId = toast.loading('creating a chat...');
+
         try {
             const res = await fetch(`${API_URL}/chat/`, {
                 method: 'POST',
@@ -95,10 +98,22 @@ export const ChatProvider = ({ children }) => {
 
             setCurrChat(data._id);
 
+            toast.update(toastId, {
+                render: 'Chat created successfully',
+                type: 'success',
+                isLoading: false,
+                autoClose: 2000
+            });
+
             setChats([...chats, data]);
         } catch(err){
-            console.log(err);
-        }
+            toast.update(toastId, {
+                render: `Error: ${err.message}`,
+                type: 'error',
+                isLoading: false,
+                autoClose: 2000
+            });
+        };
     };
 
     const search = async (q) => {

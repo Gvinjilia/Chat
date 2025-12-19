@@ -4,6 +4,8 @@ import Chat from "./pages/Chat";
 import Login from "./pages/Login";
 import Protect from "./utils/Protect";
 
+import { ToastContainer } from 'react-toastify';
+
 const App = () => {
   return (
     <>
@@ -12,6 +14,8 @@ const App = () => {
         <Route path="/" element={<Login />} /> 
         <Route path="/chat" element={<Protect><Chat /></Protect>} />
       </Routes>
+
+      <ToastContainer position="bottom-right" />
     </>
   )
 };
