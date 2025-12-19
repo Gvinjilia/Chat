@@ -16,9 +16,7 @@ export const ChatProvider = ({ children }) => {
     const socketRef = useRef(null);
 
     useEffect(() => {
-        socketRef.current = io(import.meta.env.VITE_API_URL, {
-            transports: ["websocket"]
-        });
+        socketRef.current = io(import.meta.env.VITE_API_URL);
 
         socketRef.current.on("message", (message) => {
             setMessages((prev) => [...prev, message]);
