@@ -1,6 +1,8 @@
 import { useContext, useEffect, useState } from "react";
+
 import { ChatContext } from "../context/ChatContext";
 import { AuthContext } from "../context/AuthContext";
+import { CallContext } from "../context/CallContext";
 
 import openSideBar from '../images/sidebar.png';
 import closeSideBar from '../images/sidebar (1).png';
@@ -9,8 +11,11 @@ import background from '../images/MessangerBgImage.png';
 import background3 from '../images/MessangerBgImage3.png';
 import background4 from '../images/MessangerBgImage4.png';
 
+import profile from '../images/profile.png';
+
 const Chat = () => {
     const { messages, sendMessage, createChat, currChat, search, getChats, chats, joinChat } = useContext(ChatContext);
+    const { callState, initiateCall, acceptCall, rejectCall, endCall, myVideoRef, remoteVideoRef } = useContext(CallContext);
     const { user, logout } = useContext(AuthContext);
     const [mainBackground, setMainBackground] = useState(background);
     const [chatTitle, setChatTitle] = useState('');
@@ -26,7 +31,7 @@ const Chat = () => {
 
     useEffect(() => {
       if(searchUser.length >= 2){
-        search(searchUser).then(setSearchResults); // user input ---> data = Nino GvinjiliA, setSeachResults(data = 'Nino Gvinjilia');
+        search(searchUser).then(setSearchResults);
       } else {
         setSearchResults([]);
       };
@@ -102,16 +107,77 @@ const Chat = () => {
 
     return (
         <>
+          {callState.isReceivingCall && (
+            <div className="fixed flex justify-center items-center inset-0 bg-black/30 backdrop-blur-sm z-40 transition-opacity">
+              <div className="flex justify-between bg-white p-2 pr-5 h-20 lg:w-120 md:w-full sm:w-full w-full rounded-xs shadow-2xl">
+                <div className="flex gap-2">
+                  <div>
+                    <img src={profile} className="w-15" />
+                  </div>
+                  <div className="flex flex-col justify-center items-start">
+                    <p className="text-[15px] font-light">{callState.caller?.name}</p>
+                    <p className="text-gray-600">is calling you...</p>
+                  </div>
+                </div>
+                <div className="flex gap-2 justify-center items-center">
+                  <svg onClick={acceptCall} xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill={mainBackground.textBgColor} className="cursor-pointer hover:opacity-70"><path d="M21 16.5c-.5 1.5-2.3 2.2-3.6 2.1-1.8-.2-3.7-1.1-5.2-2.1-2.1-1.5-4.1-3.8-5.3-6.3-.8-1.8-1-3.9.2-5.5.5-.6 1-.9 1.7-.9 1 0 1.2.6 1.5 1.5.3.7.6 1.4.8 2.1.4 1.3-.9 1.4-1.1 2.5-.1.7.7 1.6 1.1 2.1.7.9 1.6 1.8 2.6 2.4.6.4 1.5 1 2.1.6 1-.5.9-2.2 2.3-1.7.7.3 1.4.7 2.1 1.1 1.1.6 1 1.2.6 2.4z"/></svg>
+                  <svg onClick={rejectCall} xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 200 200" fill={mainBackground.textBgColor} className="cursor-pointer hover:opacity-70"><path d="M114,100l49-49a9.9,9.9,0,0,0-14-14L100,86,51,37A9.9,9.9,0,0,0,37,51l49,49L37,149a9.9,9.9,0,0,0,14,14l49-49,49,49a9.9,9.9,0,0,0,14-14Z"/></svg>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {callState.isRinging && (
+            <div className="fixed flex flex-col gap-2 justify-center items-center inset-0 bg-black/30 backdrop-blur-sm z-40 transition-opacity">
+              <div className="flex justify-between bg-white p-2 pr-5 h-20 lg:w-120 md:w-full sm:w-full w-full rounded-xs shadow-2xl">
+                  <div className="flex gap-2">
+                    <div>
+                      <img src={profile} className="w-15" />
+                    </div>
+                    <div className="flex flex-col justify-center items-start">
+                      <p className="text-[15px] font-light">Calling</p>
+                      <p className="text-gray-600">Waiting for answer...</p>
+                    </div>
+                  </div>
+                  <div className="flex justify-center items-center">
+                    <button onClick={endCall} style={{ backgroundColor: mainBackground.textBgColor }} className="text-white h-10 w-20 rounded-xs">Cancel</button>
+                  </div>
+              </div>
+            </div>
+          )}
+
+          {callState.isInCall && (
+            <div className="fixed h-full flex flex-col gap-2 justify-center items-center inset-0 bg-black/30 backdrop-blur-sm z-40 transition-opacity">
+                <video ref={myVideoRef} muted className="border-white shadow-2xl h-90 lg:w-120 md:w-full sm:w-full w-full" autoPlay />
+                <div className="flex justify-between bg-white p-2 pr-5 h-20 lg:w-120 md:w-full sm:w-full w-full rounded-xs shadow-2xl">
+                  <div className="flex gap-2">
+                    <div>
+                      <img src={profile} className="w-15" />
+                    </div>
+                    <div className="flex flex-col justify-center items-start">
+                      <p className="text-[15px] font-light">On a call</p>
+                      <p className="text-gray-600">In a call with you...</p>
+                    </div>
+                  </div>
+                  <div className="flex justify-center items-center">
+                    <button onClick={endCall} style={{ backgroundColor: mainBackground.textBgColor }} className="text-white h-10 w-20 rounded-xs">End Call</button>
+                  </div>
+                </div>
+                <video ref={remoteVideoRef} autoPlay />
+            </div>
+          )}
+
           <main className="h-screen flex flex-col justify-between">
               <div className="flex justify-between w-full items-center pt-7 pr-3 pl-3 pb-3">
                 <div className="flex justify-between">
                   <p onClick={logout}>Logout</p>
                 </div>
                 <div className="flex justify-end items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill={mainBackground.textBgColor}><path d="M21 16.5c-.5 1.5-2.3 2.2-3.6 2.1-1.8-.2-3.7-1.1-5.2-2.1-2.1-1.5-4.1-3.8-5.3-6.3-.8-1.8-1-3.9.2-5.5.5-.6 1-.9 1.7-.9 1 0 1.2.6 1.5 1.5.3.7.6 1.4.8 2.1.4 1.3-.9 1.4-1.1 2.5-.1.7.7 1.6 1.1 2.1.7.9 1.6 1.8 2.6 2.4.6.4 1.5 1 2.1.6 1-.5.9-2.2 2.3-1.7.7.3 1.4.7 2.1 1.1 1.1.6 1 1.2.6 2.4z"/></svg>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill={mainBackground.textBgColor}><path d="M21.05 7.3a2 2 0 0 0-1.94-.09l-2.56 1.28a1 1 0 0 0-.55.89v5.24a1 1 0 0 0 .55.89l2.56 1.28A2 2 0 0 0 20 17a2 2 0 0 0 2-2V9a2 2 0 0 0-.95-1.7Z"></path><rect x="2" y="5" width="16" height="14" rx="2" fill={mainBackground.textBgColor}></rect></svg>
+                  <svg onClick={() => initiateCall('audio')} xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill={mainBackground.textBgColor} className="cursor-pointer hover:opacity-70"><path d="M21 16.5c-.5 1.5-2.3 2.2-3.6 2.1-1.8-.2-3.7-1.1-5.2-2.1-2.1-1.5-4.1-3.8-5.3-6.3-.8-1.8-1-3.9.2-5.5.5-.6 1-.9 1.7-.9 1 0 1.2.6 1.5 1.5.3.7.6 1.4.8 2.1.4 1.3-.9 1.4-1.1 2.5-.1.7.7 1.6 1.1 2.1.7.9 1.6 1.8 2.6 2.4.6.4 1.5 1 2.1.6 1-.5.9-2.2 2.3-1.7.7.3 1.4.7 2.1 1.1 1.1.6 1 1.2.6 2.4z"/></svg>
+                  <svg onClick={() => initiateCall('video')} xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill={mainBackground.textBgColor} className="cursor-pointer hover:opacity-70"><path d="M21.05 7.3a2 2 0 0 0-1.94-.09l-2.56 1.28a1 1 0 0 0-.55.89v5.24a1 1 0 0 0 .55.89l2.56 1.28A2 2 0 0 0 20 17a2 2 0 0 0 2-2V9a2 2 0 0 0-.95-1.7Z"></path><rect x="2" y="5" width="16" height="14" rx="2" fill={mainBackground.textBgColor}></rect></svg>
                 </div>
               </div>
+
               <div className="lg:flex lg:flex-row md:flex md:flex-row sm:flex sm:flex-row flex flex-col">
                 <div className="flex flex-col pl-2 pr-2 mb-2">
                   {

@@ -9,6 +9,7 @@ const messageRouter = require('./routers/message.router');
 const cors = require('cors');
 const chatRouter = require('./routers/chat.router');
 const cookieParser = require('cookie-parser');
+const { v4: uuidV4 } = require('uuid');
 
 dotenv.config();
 
@@ -26,7 +27,8 @@ app.use(cors({
 const io = new Server(server, {
     cors: {
         origin: process.env.CLIENT_URI,
-        credentials: true
+        credentials: true,
+        methods: ["GET", "POST"]
     }
 });
 
@@ -42,9 +44,51 @@ app.use('/api/chat', chatRouter);
 
 app.use(globalErrorHandler);
 
+app.get('/', (req, res) => {
+    res.redirect(`/${uuidV4()}`);
+});
+
+console.log(uuidV4());
+
+app.use(express.static('public'));
+
+app.get('/:room', (req, res) => {
+    res.sendFile(__dirname + '/public/index.html');
+});
+
 io.on('connection', (socket) => {
     socket.on('join', (chatId) => {
-        socket.join(chatId)
+        socket.join(chatId);
+    });
+
+    socket.on('initiate-call', ({ chatId, callerId, callerName, callType }) => {
+        socket.to(chatId).emit('incoming-call', {
+            callerId,
+            callerName,
+            chatId,
+            callType
+        });
+    });
+
+    socket.on('accept-call', ({ chatId, accepterId }) => {
+        socket.to(chatId).emit('call-accepted', { accepterId });
+    });
+
+    socket.on('reject-call', ({ chatId, rejecterId }) => {
+        socket.to(chatId).emit('call-rejected', { rejecterId });
+    });
+
+    socket.on('end-call', ({ chatId }) => {
+        socket.to(chatId).emit('call-ended');
+    });
+
+    socket.on('join-room', (roomId, userId) => {
+        socket.join(roomId);
+        socket.to(roomId).emit('user-connected', userId);
+
+        socket.on('disconnect', () => {
+            socket.to(roomId).emit('user-disconnected', userId);
+        });
     });
 });
 
