@@ -28,7 +28,7 @@ export const CallProvider = ({ children }) => {
 
 
     useEffect(() => {
-        socketRef.current = io('http://localhost:3000');
+        socketRef.current = io(import.meta.env.VITE_API_URL);
 
         socketRef.current.on('incoming-call', ({ callerId, callerName, callType }) => {
             setCallState({ isInCall: false, isRinging: false, isReceivingCall: true, caller: { id: callerId, name: callerName }, callType });
